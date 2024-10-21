@@ -2,15 +2,16 @@
 FROM php:8.2-apache
 
 # Install system dependencies and PHP extensions
-RUN apt-get update -y && apt-get install -y `
-    libpng-dev `
-    libjpeg-dev `
-    libfreetype6-dev `
-    libzip-dev `
-    unzip `
-    git `
-    && docker-php-ext-configure gd --with-freetype --with-jpeg `
-    && docker-php-ext-install gd zip
+RUN apt-get update -y && \
+    apt-get install -y \
+        libpng-dev \
+        libjpeg-dev \
+        libfreetype6-dev \
+        libzip-dev \
+        unzip \
+        git && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install gd zip
 
 # Enable Apache mod_rewrite for Laravel routing
 RUN a2enmod rewrite
@@ -37,7 +38,7 @@ RUN composer dump-autoload --optimize
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Copy the environment file and generate the application key
-COPY .env.example .env  # You may want to rename this to .env if needed
+COPY .env
 RUN php artisan key:generate
 
 # Expose port 80 for web traffic
