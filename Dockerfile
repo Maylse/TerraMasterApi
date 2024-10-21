@@ -19,7 +19,7 @@ RUN a2enmod rewrite
 # Set the working directory
 WORKDIR /var/www/html
 
-# Copy composer.lock and composer.json
+# Copy composer.lock and composer.json first to leverage Docker cache
 COPY composer.lock composer.json ./
 
 # Install Composer
@@ -29,14 +29,14 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
-# Copy the rest of your Laravel application
+# Copy the rest of your Laravel application (this step should include artisan file)
 COPY . .
+
+# Ensure the .env file exists and is copied
+COPY .env .env
 
 # Set the correct permissions for storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Copy the .env file
-COPY .env .env
 
 # Run artisan commands to clear cache and optimize
 RUN php artisan config:cache && php artisan route:cache && php artisan optimize:clear
