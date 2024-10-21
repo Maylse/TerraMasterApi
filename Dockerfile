@@ -6,8 +6,10 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    libzip-dev \
+    unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql
+    && docker-php-ext-install gd pdo pdo_mysql zip mbstring
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
@@ -30,7 +32,7 @@ COPY . .
 # Set the correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Copy environment variables (you can create a .env file in the project root)
+# Copy the .env file
 COPY .env .env
 
 # Expose port 80
