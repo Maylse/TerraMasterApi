@@ -27,16 +27,19 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     && composer --version  # Check Composer version to confirm installation
 
 # Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader --prefer-dist || { echo 'Composer install failed'; exit 1; }
+RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
 # Copy the rest of your Laravel application
 COPY . .
 
-# Set the correct permissions
+# Set the correct permissions for storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Copy the .env file
 COPY .env .env
+
+# Run artisan commands to clear cache and optimize
+RUN php artisan config:cache && php artisan route:cache && php artisan optimize:clear
 
 # Expose port 80
 EXPOSE 80
