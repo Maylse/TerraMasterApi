@@ -28,7 +28,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-interaction --prefer-dist
 
 # Set environment variables
-COPY .env
+COPY .env .env
 RUN php artisan key:generate
 
 # Expose port 80
