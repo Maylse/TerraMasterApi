@@ -34,8 +34,8 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 # Set permissions for Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Expose port 9000
-EXPOSE 9000
+# Expose Nginx port 80 (not 9000)
+EXPOSE 80
 
-# Command to run the application
-CMD ["php-fpm"]
+# Command to run Nginx and PHP-FPM
+CMD ["nginx", "-g", "daemon off;"] && php-fpm
