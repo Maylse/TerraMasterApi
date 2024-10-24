@@ -22,14 +22,18 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN pecl install mongodb \
     && docker-php-ext-enable mongodb
 
+# Copy Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Install project dependencies
+COPY . .  # Make sure this is after the COPY for nginx.conf
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # Set permissions for Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Expose port 9000
-EXPOSE 9000
+# Expose port 80 for Nginx
+EXPOSE 80
 
-# Command to run the application
-CMD ["php-fpm"]
+# Command to run Nginx and PHP-FPM
+CMD service nginx start && php-fpm

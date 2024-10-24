@@ -6,7 +6,7 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile
     buildCommand: "composer install --no-dev --optimize-autoloader"
-    startCommand: "php artisan serve --host=0.0.0.0 --port=9000"
+    startCommand: "service nginx start && php-fpm" # Adjusted to start Nginx and PHP-FPM
     envVars:
       APP_ENV: production
       APP_KEY: base64:TMBg0PYe4n71DyCSVDnkAErEo8vkunHy506C/ne8oFk=
