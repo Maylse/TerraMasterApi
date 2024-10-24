@@ -11,12 +11,19 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Mail\PasswordResetMail; // Import the mailable class
+use Illuminate\Support\Facades\Mail; // Ensure Mail is imported
+use App\Models\PasswordReset;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
     // Functions for Login, Register, Profile, and Logout
 
- public function login(Request $request): JsonResponse{
+ public function login(Request $request): JsonResponse
+ {
     // Validate the incoming request data
     $request->validate([
         'email' => 'required|email|max:255',
@@ -51,18 +58,18 @@ class AuthController extends Controller
     ], 200);
 }
 
-    public function register(Request $request): JsonResponse
-    {
-        try {
+public function register(Request $request): JsonResponse
+ {  
+    try {
             // Validate the request input, including user_type
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email|max:255',
                 'password' => 'required|string|min:8|max:255',
                 'user_type' => 'required|in:finder,expert,surveyor', // Allow all user types
-                'certification_id' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,certification_id|unique:surveyors,certification_id', // Required for surveyor and expert
-                'license_number' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,license_number|unique:surveyors,license_number', // Required for surveyor and expert
-                'pricing' => 'required_if:user_type,surveyor,expert|numeric', // Required for surveyor and expert
+                'certification_id' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,certification_id|unique:surveyors,certification_id',
+                'license_number' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,license_number|unique:surveyors,license_number',
+                'pricing' => 'required_if:user_type,surveyor,expert|numeric',
             ]);
             // Create the user
             $user = User::create([
@@ -127,7 +134,7 @@ class AuthController extends Controller
         }
     }
 
-    public function profile(Request $request)
+public function profile(Request $request)
     {
         if ($request->user()) {
             return response()->json([
@@ -140,7 +147,7 @@ class AuthController extends Controller
             ], 401);
         }
     }
-    public function updateProfile(Request $request): JsonResponse
+public function updateProfile(Request $request): JsonResponse
     {
         // Validate the request
         $request->validate([
@@ -165,8 +172,63 @@ class AuthController extends Controller
         ], 200);
     }
 
+// In your AuthController
+public function forgotPassword(Request $request): JsonResponse
+{
+    // Validate the incoming request data
+    $request->validate(['email' => 'required|email']);
 
-    public function logout(Request $request)
+    // Find the user by email
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'No user found with this email address.'], 404);
+    }
+
+    // Create a token
+    $token = bin2hex(random_bytes(32));
+
+    // Store the token in the password_resets collection
+    PasswordReset::updateOrCreate(
+        ['email' => $request->email],
+        ['token' => $token, 'created_at' => now()]
+    );
+
+    // Send email with only the reset token
+    Mail::to($user->email)->send(new PasswordResetMail($token)); // Ensure this mail class is set up
+
+    return response()->json(['message' => 'Password reset token has been sent to your email.'], 200);
+}
+public function resetPassword(Request $request): JsonResponse
+{
+    // Validate the incoming request data
+    $request->validate([
+        'email' => 'required|email',
+        'token' => 'required|string',
+        'password' => 'required|string|min:8|confirmed', // Include password confirmation
+    ]);
+
+    // Check the token in the password_resets collection
+    $passwordReset = PasswordReset::where('email', $request->email)
+        ->where('token', $request->token)
+        ->first();
+
+    if (!$passwordReset) {
+        return response()->json(['message' => 'Invalid token or email.'], 400);
+    }
+
+    // Update the user's password
+    $user = User::where('email', $request->email)->first();
+    $user->password = bcrypt($request->password); // Ensure you hash the password
+    $user->save();
+
+    // Optionally, delete the token after it has been used
+    $passwordReset->delete();
+
+    return response()->json(['message' => 'Password has been successfully reset.'], 200);
+}
+
+public function logout(Request $request)
     {
         // Retrieve the authenticated user
         $user = $request->user(); // This gets the currently authenticated user

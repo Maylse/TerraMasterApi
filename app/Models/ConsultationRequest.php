@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class ConsultationRequest extends Model
 {
     use HasFactory;
-
+    protected $connection = 'mongodb' ;
     protected $fillable = [
         'finder_id',
         'expert_id', 

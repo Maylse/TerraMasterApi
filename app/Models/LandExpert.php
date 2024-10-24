@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class LandExpert extends Model
 {
     use HasFactory;
-
+    protected $connection = 'mongodb' ;
      // Specify the attributes that are mass assignable
      protected $fillable = [
         'user_id',  

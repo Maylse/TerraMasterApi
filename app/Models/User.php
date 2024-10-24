@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\CanResetPassword; // Import the CanResetPassword interface
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait; // Import the trait
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use MongoDB\Laravel\Eloquent\Model;
 
-class User extends Authenticatable
+class User extends Model implements CanResetPassword
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, CanResetPasswordTrait; // Add CanResetPasswordTrait
+
+    protected $connection = 'mongodb'; // Specify MongoDB connection
+    protected $collection = 'users'; // Specify MongoDB collection
 
     /**
      * The attributes that are mass assignable.
@@ -35,30 +39,36 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed', // Ensure passwords are hashed
+    ];
 
+    /**
+     * Define a one-to-one relationship with LandExpert.
+     */
     public function expert()
     {
         return $this->hasOne(LandExpert::class, 'user_id');
     }
 
+    /**
+     * Define a one-to-one relationship with Surveyor.
+     */
     public function surveyor()
     {
         return $this->hasOne(Surveyor::class, 'user_id');
     }
 
+    /**
+     * Define a one-to-many relationship with ConsultationRequest.
+     */
     public function consultationRequests()
-{
-    return $this->hasMany(ConsultationRequest::class, 'finder_id');
-}
+    {
+        return $this->hasMany(ConsultationRequest::class, 'finder_id');
+    }
 }

@@ -19,7 +19,7 @@ class AdminController extends Controller
     public function getAllUsers(): JsonResponse
 {
     // Fetch all users except the admin
-    $users = User::where('is_admin', false)->get(); // Adjust the condition if you want to include/exclude certain users
+    $users = User::where('is_admin', null)->get(); // Adjust the condition if you want to include/exclude certain users
 
     return response()->json([
         'users' => $users,

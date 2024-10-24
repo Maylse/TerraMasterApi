@@ -10,11 +10,17 @@ use Illuminate\Support\Facades\Route;
 
 
 //ENTRY POINTS
+
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
+//FORGOT RESET
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
 //USERS ROUTES
 Route::middleware(['auth:sanctum'])->group(function(){
+  
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::put('/profile/update', [AuthController::class, 'updateProfile']);
@@ -45,6 +51,7 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index']);
     Route::get('/admin/getAllUpdates', [AdminController::class, 'getAllUpdates']);
     Route::post('/admin/postUpdate', [AdminController::class, 'postUpdate']);
+    Route::put('/admin/editUpdate/{id}', [AdminController::class, 'editUpdate']);
     Route::delete('/admin/deleteUpdate/{id}', [AdminController::class, 'deleteUpdate']);
     //TERMINATE A USER
     Route::delete('/admin/deleteUser/{id}', [AdminController::class, 'terminateUser']);

@@ -41,7 +41,16 @@ return [
             'journal_mode' => null,
             'synchronous' => null,
         ],
-
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'dsn' => env('DB_URI', 'mongodb+srv://milessabal123:uT82MW6aPpBhQvf@cluster1.mvvca.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1'),
+            'database' => env('DB_DATABASE', 'TerraMasterDb'), 
+            'options' => [
+                'database' => env('MONGO_DB_AUTHENTICATION_DATABASE','admin'), // Default authentication database
+                // 'tls' => true, // Uncomment if you need to enforce TLS
+            ],
+        ],
+        
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
@@ -111,6 +120,8 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+
+        'default' => env('DB_CONNECTION', 'mongodb'),
 
     ],
 

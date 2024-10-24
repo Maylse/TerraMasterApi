@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class Update extends Model
 {
     use HasFactory;
-
+    protected $connection = 'mongodb' ;
        // Add title to the fillable properties
        protected $fillable = [
         'title', // Allow mass assignment for title

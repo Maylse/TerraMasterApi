@@ -1,21 +1,30 @@
-# Use the official PHP image with Apache
-FROM php:8.1-apache
+# Use the official PHP image with the required extensions
+FROM php:8.2-fpm
 
-# Install any necessary PHP extensions (add more as needed)
-RUN docker-php-ext-install pdo pdo_mysql
+# Set working directory
+WORKDIR /var/www
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
-
-# Set the working directory
-WORKDIR /var/www/html
-
-# Copy your application files to the container
+# Copy the application code
 COPY . .
 
-# Set ownership and permissions
-RUN chown -R www-data:www-data /var/www/html/public && \
-    chmod -R 755 /var/www/html/public
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd \
+    && docker-php-ext-install pdo pdo_mysql
 
-# Expose port 80
-EXPOSE 80
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install required PHP extensions for MongoDB
+RUN pecl install mongodb \
+    && docker-php-ext-enable mongodb
+
+# Expose port 9000
+EXPOSE 9000
+
+# Command to run the application
+CMD ["php-fpm"]

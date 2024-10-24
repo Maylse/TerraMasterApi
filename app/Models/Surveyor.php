@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class Surveyor extends Model
 {
     use HasFactory;
-
+    protected $connection = 'mongodb' ;
     protected $table = 'surveyors'; // Specify the table name if it's not the plural of the model name
 
     protected $fillable = [
