@@ -6,7 +6,7 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile
     buildCommand: "composer install --no-dev --optimize-autoloader"
-    startCommand: 'sh -c ''nginx -g "daemon off;" & php-fpm'''
+    startCommand: 'sh -c ''nginx -g "daemon off;" && php-fpm -F'''
     envVars:
       APP_ENV: production
       APP_KEY: base64:TMBg0PYe4n71DyCSVDnkAErEo8vkunHy506C/ne8oFk= # Ensure this is correctly generated
@@ -24,3 +24,4 @@ services:
       MAIL_PASSWORD: "awco ksoo lvfy pvhn" # Consider using secrets management
       MAIL_ENCRYPTION: tls
       MAIL_FROM_ADDRESS: milessabal123@gmail.com # Set a valid email
+      PORT: "10000" # Add the default port for Render
