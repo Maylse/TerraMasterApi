@@ -1,0 +1,27 @@
+version: 1
+services:
+  - type: web
+    name: terramasterapi
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    buildCommand: "composer install --no-dev --optimize-autoloader"
+    startCommand: "php artisan serve --host=0.0.0.0 --port=9000"
+    envVars:
+      APP_ENV: production
+      APP_KEY: base64:TMBg0PYe4n71DyCSVDnkAErEo8vkunHy506C/ne8oFk=
+      APP_DEBUG: "false"
+      APP_URL: https://terramasterapi.onrender.com
+      DB_CONNECTION: mongodb
+      DB_HOST: cluster1.mvvca.mongodb.net
+      DB_DATABASE: TerraMasterDb
+      DB_USERNAME: milessabal123
+      DB_PASSWORD: uT82MW6aPpBhQvf
+      MAIL_MAILER: smtp
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: "587"
+      MAIL_USERNAME: milessabal123@gmail.com
+      MAIL_PASSWORD: "awco ksoo lvfy pvhn"
+      MAIL_ENCRYPTION: tls
+      MAIL_FROM_ADDRESS: milessabal123@gmail.com
+      MAIL_FROM_NAME: "${APP_NAME}"

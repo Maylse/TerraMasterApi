@@ -23,6 +23,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN pecl install mongodb \
     && docker-php-ext-enable mongodb
 
+# Install project dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Set permissions for Laravel
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
 # Expose port 9000
 EXPOSE 9000
 
