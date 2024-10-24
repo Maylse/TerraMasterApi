@@ -6,21 +6,21 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile
     buildCommand: "composer install --no-dev --optimize-autoloader"
-    startCommand: "nginx -g 'daemon off;' && php-fpm" # Properly start both Nginx and PHP-FPM
+    startCommand: 'sh -c ''nginx -g "daemon off;" & php-fpm'''
     envVars:
       APP_ENV: production
-      APP_KEY: base64:TMBg0PYe4n71DyCSVDnkAErEo8vkunHy506C/ne8oFk=
+      APP_KEY: base64:TMBg0PYe4n71DyCSVDnkAErEo8vkunHy506C/ne8oFk= # Ensure this is correctly generated
       APP_DEBUG: "false"
       APP_URL: https://terramasterapi.onrender.com
       DB_CONNECTION: mongodb
       DB_HOST: cluster1.mvvca.mongodb.net
       DB_DATABASE: TerraMasterDb
       DB_USERNAME: milessabal123
-      DB_PASSWORD: uT82MW6aPpBhQvf
+      DB_PASSWORD: uT82MW6aPpBhQvf # Consider using secrets management
       MAIL_MAILER: smtp
       MAIL_HOST: smtp.gmail.com
       MAIL_PORT: "587"
       MAIL_USERNAME: milessabal123@gmail.com
-      MAIL_PASSWORD: "awco ksoo lvfy pvhn"
+      MAIL_PASSWORD: "awco ksoo lvfy pvhn" # Consider using secrets management
       MAIL_ENCRYPTION: tls
-      MAIL_FROM_ADDRESS:
+      MAIL_FROM_ADDRESS: milessabal123@gmail.com # Set a valid email
