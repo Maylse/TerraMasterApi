@@ -34,8 +34,7 @@ COPY .env .env
 # Generate the application key
 RUN php artisan key:generate
 
-# Expose port 9000 for PHP-FPM
-EXPOSE 9000
+EXPOSE 10000
 
 # Start the PHP FastCGI Process Manager
 CMD ["php-fpm"]
