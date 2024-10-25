@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\IsAdmin; // Import your middleware
+use App\Http\Middleware\CorsMiddleware; // Import your CORS middleware
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register your middleware here
         $middleware->alias([
             'is_admin' => IsAdmin::class,
+            'cors' => CorsMiddleware::class, // Register the CORS middleware
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

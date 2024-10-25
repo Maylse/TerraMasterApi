@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: laravel-app
+        container_name: laravel_app
+        volumes:
+            - ./:/var/www
+        networks:
+            - laravel-network
+
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        ports:
+            - "80:80" # This allows Render to route traffic to this container
+
+        volumes:
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf
+        networks:
+            - laravel-network
+
+networks:
+    laravel-network:
+        driver: bridge

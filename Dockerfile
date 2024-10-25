@@ -1,38 +1,41 @@
-# Use the official PHP 8.2 image with FPM
+# Use the official PHP image with the required version
 FROM php:8.2-fpm
 
-# Set the working directory
-WORKDIR /var/www
-
-# Install system dependencies
+# Install system dependencies and the MongoDB extension
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    libzip-dev \
-    unzip \
     git \
+    unzip \
+    libcurl4-openssl-dev \
+    pkg-config \
+    libssl-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd \
-    && docker-php-ext-install pdo pdo_mysql zip
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy the composer.lock and composer.json files
-COPY composer.lock composer.json ./
+# Set working directory
+WORKDIR /var/www
 
-# Install PHP dependencies using Composer
-RUN composer install --no-interaction --prefer-dist
-
-# Copy the rest of your application files
+# Copy existing application directory contents
 COPY . .
 
-# Set permissions for Laravel storage and bootstrap/cache directories
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Install PHP dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Expose port 80
-EXPOSE 80
+# Copy the .env file
+COPY .env .env
 
-# Start the PHP-FPM server
+# Generate the application key
+RUN php artisan key:generate
+
+# Expose port 9000 for PHP-FPM
+EXPOSE 9000
+
+# Start the PHP FastCGI Process Manager
 CMD ["php-fpm"]
