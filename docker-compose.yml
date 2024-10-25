@@ -10,16 +10,16 @@ services:
             - ./:/var/www
         networks:
             - laravel-network
-        # Environment variables can be defined here if needed
         environment:
-            APP_ENV: production # Set the application environment
-            APP_DEBUG: false # Turn off debug mode for production
+            APP_ENV: production # Set to production
+            APP_DEBUG: false # Disable debug mode
+            PORT: 10000 # Set PORT to 10000
 
     nginx:
         image: nginx:alpine
         container_name: nginx
         ports:
-            - "10000:80" # Forward port 10000 on the host to port 80 in the container
+            - "10000:80" # Map port 10000 on the host to port 80 in the container
         volumes:
             - ./nginx.conf:/etc/nginx/conf.d/default.conf
         networks:
