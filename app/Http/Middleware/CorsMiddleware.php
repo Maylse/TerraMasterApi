@@ -4,15 +4,27 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class CorsMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        return $next($request)
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        $response = $next($request);
+
+        // Allow all origins, you may want to restrict this in production
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+
+        // Specify allowed methods
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+
+        // Specify allowed headers
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+        // Handle pre-flight requests (OPTIONS)
+        if ($request->isMethod('OPTIONS')) {
+            return response()->json([], 200);
+        }
+
+        return $response;
     }
 }
