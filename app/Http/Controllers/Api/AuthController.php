@@ -59,80 +59,85 @@ class AuthController extends Controller
 }
 
 public function register(Request $request): JsonResponse
- {  
+{  
     try {
-            // Validate the request input, including user_type
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email|max:255',
-                'password' => 'required|string|min:8|max:255',
-                'user_type' => 'required|in:finder,expert,surveyor', // Allow all user types
-                'certification_id' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,certification_id|unique:surveyors,certification_id',
-                'license_number' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,license_number|unique:surveyors,license_number',
-                'pricing' => 'required_if:user_type,surveyor,expert|numeric',
+        // Validate the request input, including user_type
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email|max:255',
+            'password' => 'required|string|min:8|max:255',
+            'user_type' => 'required|in:finder,expert,surveyor', // Allow all user types
+            'certification_id' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,certification_id|unique:surveyors,certification_id',
+            'license_number' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,license_number|unique:surveyors,license_number',
+            'pricing' => 'required_if:user_type,surveyor,expert|numeric',
+        ]);
+
+        // Create the user
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'user_type' => $request->user_type,
+        ]);
+
+        // Create expert or surveyor based on user type
+        if ($user->user_type === 'expert') {
+            // Create an expert account
+            LandExpert::create([
+                'user_id' => $user->id,
+                'license_number' => $request->license_number,
+                'certification_id' => $request->certification_id,
+                'pricing' => $request->pricing,
             ]);
-            // Create the user
-            $user = User::create([
+        } elseif ($user->user_type === 'surveyor') {
+            Log::info('Creating Surveyor:', [
+                'user_id' => $user->id,
+                'certification_id' => $request->certification_id,
+                'license_number' => $request->license_number,
+                'pricing' => $request->pricing,
+            ]);
+            // Create a surveyor account
+            Surveyor::create([
+                'user_id' => $user->id,
+                'certification_id' => $request->certification_id,
+                'license_number' => $request->license_number,
+                'pricing' => $request->pricing,
+            ]);
+        } elseif ($user->user_type === 'finder') {
+            Log::info('Creating Finder:', [
+                'user_id' => $user->id,
                 'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'user_type' => $request->user_type,
             ]);
-    
-            // Create expert or surveyor based on user type
-            if ($user->user_type === 'expert') {
-                // Create an expert account
-                LandExpert::create([
-                    'user_id' => $user->id,
-                    'license_number' => $request->license_number,
-                    'certification_id' => $request->certification_id,
-                    'pricing' => $request->pricing,
-                ]);
-            } elseif ($user->user_type === 'surveyor') {
-                Log::info('Creating Surveyor:', [
-                    'user_id' => $user->id,
-                    'certification_id' => $request->certification_id,
-                    'license_number' => $request->license_number,
-                    'pricing' => $request->pricing,
-                ]);
-                // Create a surveyor account
-                Surveyor::create([
-                    'user_id' => $user->id,
-                    'certification_id' => $request->certification_id,
-                    'license_number' => $request->license_number,
-                    'pricing' => $request->pricing,
-                ]);
-            } elseif ($user->user_type === 'finder') {
-                Log::info('Creating Finder:', [
-                    'user_id' => $user->id,
-                    'name' => $request->name,
-                ]);
-                // Create a finder account
-                Finder::create([
-                    'user_id' => $user->id,
-                    'name' => $request->name, // Save the name in the finders table
-                ]);
-            }
-            // Generate token for the new user
-            $token = $user->createToken($user->name . ' Auth-Token')->plainTextToken;
-            return response()->json([
-                'message' => 'Registration Successful',
-                'token_type' => 'Bearer',
-                'token' => $token,
-                'user' => $user,
-            ], 201);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // Handle database errors
-            return response()->json([
-                'message' => 'Database error: ' . $e->getMessage(),
-            ], 500);
-        } catch (\Exception $e) {
-            // Handle general errors
-            return response()->json([
-                'message' => 'An error occurred: ' . $e->getMessage(),
-            ], 500);
+            // Create a finder account
+            Finder::create([
+                'user_id' => $user->id,
+                'name' => $request->name, // Save the name in the finders table
+            ]);
         }
+
+        // Generate token for the new user
+        $token = $user->createToken($user->name . ' Auth-Token')->plainTextToken;
+
+        // Return a 200 status with the relevant information
+        return response()->json([
+            'message' => 'Registration Successful',
+            'token_type' => 'Bearer',
+            'token' => $token,
+            'user' => $user,
+        ], 200); // Change from 201 to 200
+    } catch (\Illuminate\Database\QueryException $e) {
+        // Handle database errors
+        return response()->json([
+            'message' => 'Database error: ' . $e->getMessage(),
+        ], 500);
+    } catch (\Exception $e) {
+        // Handle general errors
+        return response()->json([
+            'message' => 'An error occurred: ' . $e->getMessage(),
+        ], 500);
     }
+}
+
 
 public function profile(Request $request)
     {
