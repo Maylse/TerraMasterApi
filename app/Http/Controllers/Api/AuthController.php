@@ -88,12 +88,6 @@ public function register(Request $request): JsonResponse
                 'pricing' => $request->pricing,
             ]);
         } elseif ($user->user_type === 'surveyor') {
-            Log::info('Creating Surveyor:', [
-                'user_id' => $user->id,
-                'certification_id' => $request->certification_id,
-                'license_number' => $request->license_number,
-                'pricing' => $request->pricing,
-            ]);
             // Create a surveyor account
             Surveyor::create([
                 'user_id' => $user->id,
@@ -102,10 +96,6 @@ public function register(Request $request): JsonResponse
                 'pricing' => $request->pricing,
             ]);
         } elseif ($user->user_type === 'finder') {
-            Log::info('Creating Finder:', [
-                'user_id' => $user->id,
-                'name' => $request->name,
-            ]);
             // Create a finder account
             Finder::create([
                 'user_id' => $user->id,
@@ -122,7 +112,7 @@ public function register(Request $request): JsonResponse
             'token_type' => 'Bearer',
             'token' => $token,
             'user' => $user,
-        ], 200); // Change from 201 to 200
+        ], 201);
     } catch (\Illuminate\Database\QueryException $e) {
         // Handle database errors
         return response()->json([
@@ -135,7 +125,6 @@ public function register(Request $request): JsonResponse
         ], 500);
     }
 }
-
 
 public function profile(Request $request)
     {
