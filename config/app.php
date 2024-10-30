@@ -135,12 +135,12 @@ return [
     |
     */
 
-    'providers' => [
+    // 'providers' => [
 
-        // Other Service Providers
+    //     // Other Service Providers
 
-        // MongoDB Service Provider
-        MongoDB\Laravel\MongoDBServiceProvider::class,
-    ],
+    //     // MongoDB Service Provider
+    //     MongoDB\Laravel\MongoDBServiceProvider::class,
+    // ],
 
 ];
