@@ -58,50 +58,19 @@ class AuthController extends Controller
 
 public function register(Request $request): JsonResponse
 {  
-    // Step 1: Verify MongoDB Connection
     try {
-        $mongoClient = new \MongoDB\Client(env('DB_URI'));
-        $database = $mongoClient->selectDatabase(env('DB_DATABASE'));
-        $database->command(['ping' => 1]);
-        Log::info('MongoDB connection successful.');
-    } catch (\Exception $e) {
-        Log::error('MongoDB connection failed: ' . $e->getMessage());
-        return response()->json(['message' => 'Database connection failed.'], 500);
-    }
-
-    // Step 2: Validate Input Data
-    try {
+        // Validate the request input
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|min:8|max:255',
             'user_type' => 'required|in:finder,expert,surveyor',
-            'certification_id' => 'required_if:user_type,surveyor,expert|string',
-            'license_number' => 'required_if:user_type,surveyor,expert|string',
+            'certification_id' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,certification_id|unique:surveyors,certification_id',
+            'license_number' => 'required_if:user_type,surveyor,expert|string|unique:land_experts,license_number|unique:surveyors,license_number',
             'pricing' => 'required_if:user_type,surveyor,expert|numeric',
         ]);
 
-        // Check if the email, license number, and certification ID are unique
-        if (User::where('email', $request->email)->exists()) {
-            return response()->json(['message' => 'Email already exists.'], 422);
-        }
-        if ($request->user_type !== 'finder') {
-            if (LandExpert::where('license_number', $request->license_number)->exists() || 
-                Surveyor::where('license_number', $request->license_number)->exists()) {
-                return response()->json(['message' => 'License number already exists.'], 422);
-            }
-            if (LandExpert::where('certification_id', $request->certification_id)->exists() || 
-                Surveyor::where('certification_id', $request->certification_id)->exists()) {
-                return response()->json(['message' => 'Certification ID already exists.'], 422);
-            }
-        }
-        
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json(['message' => 'Validation error: ' . $e->getMessage()], 422);
-    }
-
-    // Step 3: Create User and Associated Profile
-    try {
+        // Create the user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -109,56 +78,43 @@ public function register(Request $request): JsonResponse
             'user_type' => $request->user_type,
             'is_admin' => false,
         ]);
-        Log::info('User created successfully with ID: ' . $user->id);
 
-        // Create corresponding profile based on user_type
-        switch ($user->user_type) {
-            case 'expert':
-                LandExpert::create([
-                    'user_id' => $user->id,
-                    'license_number' => $request->license_number,
-                    'certification_id' => $request->certification_id,
-                    'pricing' => $request->pricing,
-                ]);
-                Log::info('LandExpert profile created for user ID: ' . $user->id);
-                break;
-            case 'surveyor':
-                Surveyor::create([
-                    'user_id' => $user->id,
-                    'certification_id' => $request->certification_id,
-                    'license_number' => $request->license_number,
-                    'pricing' => $request->pricing,
-                ]);
-                Log::info('Surveyor profile created for user ID: ' . $user->id);
-                break;
-            case 'finder':
-                Finder::create([
-                    'user_id' => $user->id,
-                    'name' => $request->name,
-                ]);
-                Log::info('Finder profile created for user ID: ' . $user->id);
-                break;
+        // Create expert or surveyor based on user type
+        if ($user->user_type === 'expert') {
+            LandExpert::create([
+                'user_id' => $user->id,
+                'license_number' => $request->license_number,
+                'certification_id' => $request->certification_id,
+                'pricing' => $request->pricing,
+            ]);
+        } elseif ($user->user_type === 'surveyor') {
+            Surveyor::create([
+                'user_id' => $user->id,
+                'certification_id' => $request->certification_id,
+                'license_number' => $request->license_number,
+                'pricing' => $request->pricing,
+            ]);
+        } elseif ($user->user_type === 'finder') {
+            Finder::create([
+                'user_id' => $user->id,
+                'name' => $request->name,
+            ]);
         }
 
-        // Step 4: Generate Token
-        $token = $user->createToken($user->name . ' Auth-Token')->plainTextToken;
-        
-        // Step 5: Return Success Response
+        // Return response without token for testing
         return response()->json([
             'message' => 'Registration Successful',
-            'token_type' => 'Bearer',
-            'token' => $token,
             'user' => $user,
         ], 201);
 
-    } catch (MongoDBException $e) {
-        Log::error('MongoDB error: ' . $e->getMessage());
-        return response()->json(['message' => 'Database error: ' . $e->getMessage()], 500);
     } catch (\Exception $e) {
-        Log::error('An error occurred: ' . $e->getMessage());
-        return response()->json(['message' => 'An error occurred: ' . $e->getMessage()], 500);
+        return response()->json([
+            'message' => 'An error occurred.',
+            'error' => $e->getMessage(),
+        ], 500);
     }
 }
+
 
 
 public function profile(Request $request)
