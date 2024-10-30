@@ -9,7 +9,7 @@ class LandExpert extends Model
 {
     use HasFactory;
     protected $connection = 'mongodb' ;
-    protected $collection = 'land_experts';
+    
      // Specify the attributes that are mass assignable
      protected $fillable = [
         'user_id',  

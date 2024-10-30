@@ -26,7 +26,7 @@ class User extends Model implements CanResetPassword
         'email',
         'password',
         'user_type', 
-        'is_admin',// Add user_type to the fillable array
+        'is_admin'// Add user_type to the fillable array
     ];
 
     /**

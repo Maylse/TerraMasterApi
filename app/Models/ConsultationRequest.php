@@ -9,7 +9,6 @@ class ConsultationRequest extends Model
 {
     use HasFactory;
     protected $connection = 'mongodb' ;
-    protected $collection = 'consultation_requests';
     protected $fillable = [
         'finder_id',
         'expert_id', 
