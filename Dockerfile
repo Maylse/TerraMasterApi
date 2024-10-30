@@ -66,5 +66,5 @@ RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf
 # Expose port 80 for Render
 EXPOSE 80
 
-# Start Apache on port 80
+# Start
 CMD ["apache2-foreground", "-D", "FOREGROUND"]
