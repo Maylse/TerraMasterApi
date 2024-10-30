@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Log;
 use App\Mail\PasswordResetMail; // Import the mailable class
 use Illuminate\Support\Facades\Mail; // Ensure Mail is imported
 use App\Models\PasswordReset;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -78,6 +75,7 @@ public function register(Request $request): JsonResponse
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'user_type' => $request->user_type,
+            'is_admin' => false, // Automatically assign is_admin to false
         ]);
 
         // Create expert or surveyor based on user type
