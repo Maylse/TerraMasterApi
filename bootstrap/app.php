@@ -7,6 +7,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\IsAdmin; // Import your middleware
 use App\Http\Middleware\CorsMiddleware; // Import your CORS middleware
+use Illuminate\Support\Facades\Log; // Import the Log facade
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,14 +22,28 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_admin' => IsAdmin::class,
             'cors' => CorsMiddleware::class, // Register the CORS middleware
         ]);
-        
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
-            if ($request->is('api/*')) {
+        $exceptions->render(function (\Throwable $e, Request $request) {
+            // Log the exception details
+            Log::error($e->getMessage(), [
+                'exception' => $e,
+                'url' => $request->url(),
+                'method' => $request->method(),
+                'request' => $request->all(), // Log the request data
+            ]);
+
+            // Handle not found errors
+            if ($e instanceof NotFoundHttpException && $request->is('api/*')) {
                 return response()->json([
                     'message' => 'Record not found.'
                 ], 404);
             }
+
+            // Handle other exceptions for API requests
+            return response()->json([
+                'message' => 'An error occurred.',
+                'error' => $e->getMessage(), // Include the error message
+            ], 500);
         });
     })->create();
