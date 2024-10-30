@@ -11,36 +11,37 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['cors'])->group(function () {
-    Route::get('/test-mongo', function() {
-        try {
-            $mongoUri = env('DB_URI');
-            $mongoDatabase = env('DB_DATABASE');
-            
-            if (is_null($mongoDatabase)) {
-                return response()->json(['error' => 'Database name is null. Check your environment variables.'], 500);
-            }
-    
-            $mongoClient = new \MongoDB\Client($mongoUri);
-            $database = $mongoClient->selectDatabase($mongoDatabase);
-            $database->command(['ping' => 1]);
-            
-            return response()->json(['message' => 'MongoDB connection successful.']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+Route::get('/test-mongo', function() {
+    try {
+        $mongoUri = env('DB_URI');
+        $mongoDatabase = env('DB_DATABASE');
+        
+        if (is_null($mongoDatabase)) {
+            return response()->json(['error' => 'Database name is null. Check your environment variables.'], 500);
         }
-    });
+
+        $mongoClient = new \MongoDB\Client($mongoUri);
+        $database = $mongoClient->selectDatabase($mongoDatabase);
+        $database->command(['ping' => 1]);
+        
+        return response()->json(['message' => 'MongoDB connection successful.']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
     //TEST
     Route::get('/test', function () {
         return response()->json(['message' => 'This is a test endpoint.']);
     });
+    
     
     //ENTRY POINTS
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     
     //FORGOT RESET
-      Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     //USERS ROUTES
     Route::middleware(['auth:sanctum'])->group(function(){
       
