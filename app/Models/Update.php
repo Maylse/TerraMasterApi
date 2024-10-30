@@ -9,6 +9,7 @@ class Update extends Model
 {
     use HasFactory;
     protected $connection = 'mongodb' ;
+    protected $collection = 'updates';
        // Add title to the fillable properties
        protected $fillable = [
         'title', // Allow mass assignment for title

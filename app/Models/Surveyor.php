@@ -9,7 +9,7 @@ class Surveyor extends Model
 {
     use HasFactory;
     protected $connection = 'mongodb' ;
-    protected $table = 'surveyors'; // Specify the table name if it's not the plural of the model name
+    protected $collection = 'surveyors'; // Specify the table name if it's not the plural of the model name
 
     protected $fillable = [
         'user_id',        // Foreign key to users table
