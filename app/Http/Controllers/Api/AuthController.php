@@ -100,9 +100,9 @@ public function register(Request $request): JsonResponse
                 'name' => $request->name,
             ]);
         }
-
-        // Assuming $user is the newly created user instance
-        $token = $user->createToken($user->name . ' Auth-Token')->plainTextToken;
+        if ($user) {
+            $token = $user->createToken($user->name . ' Auth-Token')->plainTextToken;
+        }
 
         return response()->json([
             'message' => 'Registration Successful',
