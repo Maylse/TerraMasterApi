@@ -42,14 +42,15 @@ return [
             'synchronous' => null,
         ],
         'mongodb' => [
-            'driver' => 'mongodb',
-            'dsn' => env('DB_URI', 'mongodb+srv://milessabal123:uT82MW6aPpBhQvf@cluster1.mvvca.mongodb.net/TerraMasterDb?retryWrites=true&w=majority'),
+            'driver'   => 'mongodb',
+            'dsn'      => env('DB_URI', 'mongodb+srv://milessabal123:uT82MW6aPpBhQvf@cluster1.mvvca.mongodb.net/TerraMasterDb?retryWrites=true&w=majority'),
             'database' => env('DB_DATABASE', 'TerraMasterDb'), 
-            'options' => [
-                'database' => env('MONGO_DB_AUTHENTICATION_DATABASE', 'admin'), // Default authentication database
+            'options'  => [
+                'authSource' => env('MONGO_DB_AUTHENTICATION_DATABASE', 'admin'), // Default authentication database
+                // Add any additional MongoDB options here if needed
             ],
         ],
-        
+    
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),

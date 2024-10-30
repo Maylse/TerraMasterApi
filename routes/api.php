@@ -5,11 +5,21 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ConsultationController;
 use App\Http\Controllers\Api\UsersController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['cors'])->group(function () {
+
+    Route::get('/test-mongo', function () {
+        try {
+            DB::connection('mongodb')->getDatabase()->command(['ping' => 1]);
+            return response()->json(['message' => 'MongoDB connection is working']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
     //TEST
     Route::get('/test', function () {
         return response()->json(['message' => 'This is a test endpoint.']);
