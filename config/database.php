@@ -43,11 +43,10 @@ return [
         ],
         'mongodb' => [
             'driver' => 'mongodb',
-            'dsn' => env('DB_URI', 'mongodb+srv://milessabal123:uT82MW6aPpBhQvf@cluster1.mvvca.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1'),
+            'dsn' => env('DB_URI', 'mongodb+srv://milessabal123:uT82MW6aPpBhQvf@cluster1.mvvca.mongodb.net/TerraMasterDb?retryWrites=true&w=majority'),
             'database' => env('DB_DATABASE', 'TerraMasterDb'), 
             'options' => [
-                'database' => env('MONGO_DB_AUTHENTICATION_DATABASE','admin'), // Default authentication database
-                // 'tls' => true, // Uncomment if you need to enforce TLS
+                'database' => env('MONGO_DB_AUTHENTICATION_DATABASE', 'admin'), // Default authentication database
             ],
         ],
         
