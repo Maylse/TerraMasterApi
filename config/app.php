@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\IsAdmin;
+use MongoDB\Laravel\MongoDBServiceProvider;
 
 return [
 
@@ -123,6 +124,23 @@ return [
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
+    ],
+     /*
+    |--------------------------------------------------------------------------
+    | Service Providers
+    |--------------------------------------------------------------------------
+    |
+    | Here you may list the service providers for your application. Laravel 
+    | will load these providers for you.
+    |
+    */
+
+    'providers' => [
+
+        // Other Service Providers
+
+        // MongoDB Service Provider
+        MongoDB\Laravel\MongoDBServiceProvider::class,
     ],
 
 ];
