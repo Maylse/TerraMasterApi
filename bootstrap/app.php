@@ -20,30 +20,32 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register your middleware here
         $middleware->alias([
             'is_admin' => IsAdmin::class,
-            'cors' => CorsMiddleware::class, // Register the CORS middleware
+            'cors' => CorsMiddleware::class,
+        ]);
+        
+        // Middleware groups
+        $middleware->group('api', [
+            'throttle:api',
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            'bindings',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Throwable $e, Request $request) {
-            // Log the exception details
             Log::error($e->getMessage(), [
                 'exception' => $e,
                 'url' => $request->url(),
                 'method' => $request->method(),
-                'request' => $request->all(), // Log the request data
+                'request' => $request->all(),
             ]);
 
-            // Handle not found errors
             if ($e instanceof NotFoundHttpException && $request->is('api/*')) {
-                return response()->json([
-                    'message' => 'Record not found.'
-                ], 404);
+                return response()->json(['message' => 'Record not found.'], 404);
             }
 
-            // Handle other exceptions for API requests
             return response()->json([
                 'message' => 'An error occurred.',
-                'error' => $e->getMessage(), // Include the error message
+                'error' => $e->getMessage(),
             ], 500);
         });
     })->create();
