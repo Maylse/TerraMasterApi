@@ -67,4 +67,5 @@ RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf
 EXPOSE 10000
 
 # Start Apache on port 10000
-CMD ["apache2-foreground", "-D", "FOREGROUND"]
+CMD ["apache2-foreground", "-D", "FOREGROUND", "-c", "Listen 10000"]
+
