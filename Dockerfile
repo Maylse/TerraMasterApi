@@ -48,7 +48,7 @@ RUN php artisan config:cache && \
     php artisan view:cache
 
 # Configure Apache to serve from Laravel's public directory
-RUN echo '<VirtualHost *:10000>\n\
+RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
         Options Indexes FollowSymLinks\n\
@@ -56,14 +56,15 @@ RUN echo '<VirtualHost *:10000>\n\
         Require all granted\n\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
 # Enable the rewrite module
 RUN a2enmod rewrite
 
 # Set the ServerName to suppress the warning
 RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf
 
-# Expose port 10000 for Render
-EXPOSE 10000
+# Expose port 80 for Render
+EXPOSE 80
 
-# Start Apache on port 10000
-CMD ["apache2-foreground", "-D", "FOREGROUND", "-c", "Listen 10000"]
+# Start Apache on port 80
+CMD ["apache2-foreground", "-D", "FOREGROUND"]
