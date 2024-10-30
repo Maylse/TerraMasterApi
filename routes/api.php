@@ -11,12 +11,19 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['cors'])->group(function () {
-
     Route::get('/test-mongo', function() {
         try {
-            $mongoClient = new \MongoDB\Client(env('MONGODB_URI'));
-            $database = $mongoClient->selectDatabase(env('MONGODB_DATABASE')); // Replace with your database name
-            $database->command(['ping' => 1]); // This is a simple command to check connectivity
+            $mongoUri = env('DB_URI');
+            $mongoDatabase = env('DB_DATABASE');
+            
+            if (is_null($mongoDatabase)) {
+                return response()->json(['error' => 'Database name is null. Check your environment variables.'], 500);
+            }
+    
+            $mongoClient = new \MongoDB\Client($mongoUri);
+            $database = $mongoClient->selectDatabase($mongoDatabase);
+            $database->command(['ping' => 1]);
+            
             return response()->json(['message' => 'MongoDB connection successful.']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
