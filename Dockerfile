@@ -34,10 +34,8 @@ RUN composer clear-cache && \
     COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-interaction
 
 # Set the proper permissions for Laravel storage and cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Copy .env file to container (optional: if secrets are managed in Render)
-COPY .env .env
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Generate application key if not set in .env
 RUN php artisan key:generate
@@ -47,8 +45,21 @@ RUN php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
 
-# Expose port 10000 for Render
+# Enable Apache rewrite module
+RUN a2enmod rewrite
+
+# Expose port 10000
 EXPOSE 10000
 
-# Start Apache on port 10000
-CMD ["apache2-foreground", "-D", "FOREGROUND", "-c", "Listen 10000"]
+# Configure Apache to serve from Laravel's public directory
+RUN echo '<VirtualHost *:10000> \
+    DocumentRoot /var/www/html/public \
+    <Directory /var/www/html/public> \
+        Options Indexes FollowSymLinks \
+        AllowOverride All \
+        Require all granted \
+    </Directory> \
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
+# Start Apache in the foreground
+CMD ["apache2-foreground"]
