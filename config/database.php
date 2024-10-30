@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'mongodb'),
 
     /*
     |--------------------------------------------------------------------------
@@ -47,7 +47,6 @@ return [
             'database' => env('DB_DATABASE', 'TerraMasterDb'), 
             'options'  => [
                 'authSource' => env('MONGO_DB_AUTHENTICATION_DATABASE', 'admin'), // Default authentication database
-                // Add any additional MongoDB options here if needed
             ],
         ],
     
