@@ -11,8 +11,8 @@ class CorsMiddleware
     {
         $response = $next($request);
 
-        // Allow all origins, you may want to restrict this in production
-        $response->headers->set('Access-Control-Allow-Origin', '*');
+        // Allow the specific origin
+        $response->headers->set('Access-Control-Allow-Origin', 'https://terramasterapi.onrender.com');
 
         // Specify allowed methods
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
