@@ -9,6 +9,7 @@ class Finder extends Model
 {
     use HasFactory;
     protected $connection = 'mongodb' ;
+    protected $collection = 'finders';
     protected $fillable = [
         'user_id', // Foreign key
         'name', // Include name in fillable fields
