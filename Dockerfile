@@ -1,41 +1,48 @@
-# Use the official PHP image with the required version
-FROM php:8.2-fpm
+# Use the official PHP 8.2 image with Apache
+FROM php:8.2-apache
 
-# Install system dependencies and the MongoDB extension
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
+    git \
+    curl \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    git \
+    libonig-dev \
+    libxml2-dev \
+    zip \
     unzip \
-    libcurl4-openssl-dev \
-    pkg-config \
-    libssl-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd \
-    && pecl install mongodb \
-    && docker-php-ext-enable mongodb
+    && docker-php-ext-install pdo mbstring gd
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /var/www
+# Set the working directory
+WORKDIR /var/www/html
 
-# Copy existing application directory contents
+# Copy the Laravel project files to the container
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+# Install Laravel dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Copy the .env file
+# Set the proper permissions for Laravel storage and cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Copy .env file to container (optional: if secrets are managed in Render)
 COPY .env .env
 
-# Generate the application key
+# Generate application key if not set in .env
 RUN php artisan key:generate
 
-# Expose port 10000
+# Clear and cache configuration
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
+
+# Expose port 10000 for Render
 EXPOSE 10000
 
-# Start the PHP FastCGI Process Manager
-CMD ["php-fpm"]
+# Start Apache on port 10000
+CMD ["apache2-foreground", "-D", "FOREGROUND", "-c", "Listen 10000"]
