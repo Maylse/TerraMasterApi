@@ -51,6 +51,9 @@ RUN a2enmod rewrite
 # Expose port 10000
 EXPOSE 10000
 
+# Set DirectoryIndex in Apache config
+RUN echo 'DirectoryIndex index.php index.html' >> /etc/apache2/apache2.conf
+
 # Configure Apache to serve from Laravel's public directory
 RUN echo '<VirtualHost *:10000>\n\
     DocumentRoot /var/www/html/public\n\
