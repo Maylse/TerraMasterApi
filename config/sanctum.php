@@ -21,9 +21,9 @@ return [
     //     Sanctum::currentApplicationUrlWithPort()
     // ))),
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s,%s',
+        '%s%s',
         'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        'terramasterapi.onrender.com'
+        Sanctum::currentApplicationUrlWithPort()
     ))),
 
     /*
@@ -38,7 +38,7 @@ return [
     |
     */
 
-    'guard' => ['web'],
+    'guard' => ['web', 'api'],
 
     /*
     |--------------------------------------------------------------------------

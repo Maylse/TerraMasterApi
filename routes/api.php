@@ -40,7 +40,7 @@ Route::get('/test-mongo', function() {
     Route::post('/register', [AuthController::class, 'register']);
     
     //FORGOT RESET
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     //USERS ROUTES
     Route::middleware(['auth:sanctum'])->group(function(){

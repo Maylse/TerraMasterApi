@@ -101,9 +101,15 @@ public function register(Request $request): JsonResponse
             ]);
         }
         if ($user) {
-            $token = $user->createToken($user->name . ' Auth-Token')->plainTextToken;
+            try {
+                $token = $user->createToken($user->name . ' Auth-Token')->plainTextToken;
+            } catch (\Exception $tokenException) {
+                return response()->json([
+                    'message' => 'Token creation failed.',
+                    'error' => $tokenException->getMessage(),
+                ], 500);
+            }
         }
-
         return response()->json([
             'message' => 'Registration Successful',
             'token_type' => 'Bearer',

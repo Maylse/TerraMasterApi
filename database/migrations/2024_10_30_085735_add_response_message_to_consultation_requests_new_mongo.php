@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('consultation_requests', function (Blueprint $table) {
-            $table->text('response_message')->nullable()->after('status');
+        Schema::collection('consultation_requests', function (Blueprint $table) {
+            $table->text('response_message')->nullable(); // Add the new column
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('consultation_requests', function (Blueprint $table) {
-            $table->dropColumn('response_message');
+        Schema::collection('consultation_requests', function (Blueprint $table) {
+            $table->dropColumn('response_message'); // Remove the column
         });
     }
 };
