@@ -101,9 +101,20 @@ public function register(Request $request): JsonResponse
             ]);
         }
 
+          // Generate token for the new user
+          $token = $user->createToken($user->name . ' Auth-Token')->plainTextToken;
+          return response()->json([
+              'message' => 'Registration Successful',
+              'token_type' => 'Bearer',
+              'token' => $token,
+              'user' => $user,
+          ], 201);
+
         // Return response without token for testing
         return response()->json([
             'message' => 'Registration Successful',
+            'token_type' => 'Bearer',
+            'token' => $token,
             'user' => $user,
         ], 201);
 
