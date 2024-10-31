@@ -8,20 +8,28 @@ use App\Http\Controllers\Api\UsersController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use MongoDB\Client as MongoDBClient;
 
 
 
 Route::middleware(['cors'])->group(function () {
-    Route::get('/test-mongo', function () {
-        try {
-            $client = new MongoDBClient(env('DB_URI'));
-            $databases = $client->listDatabases();
-            return response()->json($databases);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+Route::get('/test-mongo', function() {
+    try {
+        $mongoUri = env('DB_URI');
+        $mongoDatabase = env('DB_DATABASE');
+        
+        if (is_null($mongoDatabase)) {
+            return response()->json(['error' => 'Database name is null. Check your environment variables.'], 500);
         }
-    });
+
+        $mongoClient = new \MongoDB\Client($mongoUri);
+        $database = $mongoClient->selectDatabase($mongoDatabase);
+        $database->command(['ping' => 1]);
+        
+        return response()->json(['message' => 'MongoDB connection successful.']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+});
     //TEST
     Route::get('/test', function () {
         return response()->json(['message' => 'This is a test endpoint.']);
